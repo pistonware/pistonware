@@ -79,16 +79,45 @@ local function finishLoading()
 	end
 end
 
-if not isfile('pistonware/profiles/gui.txt') then
-	writefile('pistonware/profiles/gui.txt', 'new')
-end
-local gui = readfile('pistonware/profiles/gui.txt')
+	if getgenv.AutoConfig then
+		local placeId = tostring(game.PlaceId)
+		local gameId = tostring(game.GameId)
+		local hasProfile = false
+		for _, file in listfiles('pistonware/profiles') do
+			if isfile(file) and (file:find(placeId .. '.txt') or file:find(gameId .. '.gui.txt')) then
+				hasProfile = true
+				break
+			end
+		end
+		if not hasProfile then
+			local profileTypes = {'default', 'blatant', 'legit'}
+			for _, profileName in ipairs(profileTypes) do
+				local suc, res = pcall(function()
+					return game:HttpGet('https://raw.githubusercontent.com/pistonware/pistonware/main/profiles/'..profileName..placeId..'.txt', true)
+				end)
+				if suc and res ~= '404: Not Found' then
+					writefile('pistonware/profiles/'..profileName..placeId..'.txt', res)
+				end
+			end
+			local suc2, guiRes = pcall(function()
+				return game:HttpGet('https://raw.githubusercontent.com/pistonware/pistonware/main/profiles/'..gameId..'.gui.txt', true)
+			end)
+			if suc2 and guiRes ~= '404: Not Found' then
+				writefile('pistonware/profiles/'..gameId..'.gui.txt', guiRes)
+			end
+		end
+	end
 
-if not isfolder('pistonware/assets/'..gui) then
-	makefolder('pistonware/assets/'..gui)
-end
-vape = loadstring(downloadFile('pistonware/guis/'..gui..'.lua'), 'gui')()
-shared.vape = vape
+	if not isfile('pistonware/profiles/gui.txt') then
+		writefile('pistonware/profiles/gui.txt', 'new')
+	end
+	local gui = readfile('pistonware/profiles/gui.txt')
+
+	if not isfolder('pistonware/assets/'..gui) then
+		makefolder('pistonware/assets/'..gui)
+	end
+	vape = loadstring(downloadFile('pistonware/guis/'..gui..'.lua'), 'gui')()
+	shared.vape = vape
 
 if not shared.VapeIndependent then
 	loadstring(downloadFile('pistonware/games/universal.lua'), 'universal')()
