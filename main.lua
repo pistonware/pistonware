@@ -79,7 +79,7 @@ local function finishLoading()
 	end
 end
 
-	if getgenv.AutoConfig then
+	if getgenv().AutoConfig then
 		local placeId = tostring(game.PlaceId)
 		local gameId = tostring(game.GameId)
 		local hasProfile = false
