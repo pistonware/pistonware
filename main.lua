@@ -82,28 +82,25 @@ end
 	if getgenv().AutoConfig then
 		local placeId = tostring(game.PlaceId)
 		local gameId = tostring(game.GameId)
-		local hasProfile = false
-		for _, file in listfiles('pistonware/profiles') do
-			if isfile(file) and (file:find(placeId .. '.txt') or file:find(gameId .. '.gui.txt')) then
-				hasProfile = true
-				break
-			end
-		end
-		if not hasProfile then
-			local profileTypes = {'default', 'blatant', 'legit'}
-			for _, profileName in ipairs(profileTypes) do
+		local profileTypes = {'default', 'blatant', 'legit'}
+		for _, profileName in ipairs(profileTypes) do
+			local profilePath = 'pistonware/profiles/'..profileName..placeId..'.txt'
+			if not isfile(profilePath) then
 				local suc, res = pcall(function()
 					return game:HttpGet('https://raw.githubusercontent.com/pistonware/pistonware/main/profiles/'..profileName..placeId..'.txt', true)
 				end)
 				if suc and res ~= '404: Not Found' then
-					writefile('pistonware/profiles/'..profileName..placeId..'.txt', res)
+					writefile(profilePath, res)
 				end
 			end
-			local suc2, guiRes = pcall(function()
+		end
+		local guiPath = 'pistonware/profiles/'..gameId..'.gui.txt'
+		if not isfile(guiPath) then
+			local suc, guiRes = pcall(function()
 				return game:HttpGet('https://raw.githubusercontent.com/pistonware/pistonware/main/profiles/'..gameId..'.gui.txt', true)
 			end)
-			if suc2 and guiRes ~= '404: Not Found' then
-				writefile('pistonware/profiles/'..gameId..'.gui.txt', guiRes)
+			if suc and guiRes ~= '404: Not Found' then
+				writefile(guiPath, guiRes)
 			end
 		end
 	end
